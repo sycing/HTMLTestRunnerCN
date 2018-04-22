@@ -55,8 +55,6 @@ class APITestCase(unittest.TestCase):
 
     def testCase6(self):
         pass
-    def testCase7(self):
-        a==b
 
 #添加Suite
 def Suite():
@@ -74,7 +72,6 @@ def Suite():
     suiteTest.addTest(APITestCase("testCase4"))
     suiteTest.addTest(APITestCase("testCase5"))
     suiteTest.addTest(APITestCase("testCase6"))
-    suiteTest.addTest(APITestCase("testCase7"))
     return suiteTest
 
 '''
@@ -88,10 +85,8 @@ if __name__ == ‘python‘:
 ---试了不行
 '''
 if __name__ == '__main__':
-    import os
-    print(os.getcwd())
     #确定生成报告的路径
-    filePath ='HTMLTestReportCN.html'
+    filePath ='F:\\HTMLTestReportCN.html'
     fp = open(filePath,'wb')
     #生成报告的Title,描述
     runner = HTMLTestReportCN.HTMLTestRunner(
