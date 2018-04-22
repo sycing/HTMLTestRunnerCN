@@ -220,7 +220,7 @@ function showCase(level) {
         tr = trs[i];
         id = tr.id;
         if (id.substr(0,2) == 'ft') {
-            if (level == 2 || level == 0 ) {
+            if (level == 2 || level == 0 || level == 4 ) {
                 tr.className = 'hiddenRow';
             }
             else {
@@ -228,11 +228,20 @@ function showCase(level) {
             }
         }
         if (id.substr(0,2) == 'pt') {
-            if (level < 2) {
+            if (level < 2 || level == 4) {
                 tr.className = 'hiddenRow';
             }
             else {
                 tr.className = '';
+            }
+        }
+        //增加错误的按钮 --sycing
+        if (id.substr(0,2) == 'et') {
+            if (level==4) {
+                tr.className = '';
+            }
+            else {
+                tr.className = 'hiddenRow';
             }
         }
     }
@@ -356,8 +365,9 @@ table       { font-size: 100%; }
     REPORT_TMPL = """
 <p id='show_detail_line'>
 <a class="btn btn-primary" href='javascript:showCase(0)'>概要{ %(passrate)s }</a>
-<a class="btn btn-danger" href='javascript:showCase(1)'>失败{ %(fail)s }</a>
 <a class="btn btn-success" href='javascript:showCase(2)'>通过{ %(Pass)s }</a>
+<a class="btn btn-danger" href='javascript:showCase(1)'>失败{ %(fail)s }</a>
+<a class="btn btn-warning" href='javascript:showCase(4)'>错误{ %(error)s }</a>
 <a class="btn btn-info" href='javascript:showCase(3)'>所有{ %(count)s }</a>
 </p>
 <table id='result_table' class="table table-condensed table-bordered table-hover">
@@ -405,14 +415,26 @@ table       { font-size: 100%; }
 <tr id='%(tid)s' class='%(Class)s'>
     <td class='%(style)s'><div class='testcase'>%(desc)s</div></td>
     <td colspan='5' align='center'>
-    <!--默认收起错误信息 -Findyou
-    <button id='btn_%(tid)s' type="button"  class="btn btn-danger btn-xs collapsed" data-toggle="collapse" data-target='#div_%(tid)s'>%(status)s</button>
-    <div id='div_%(tid)s' class="collapse">  -->
+    <!--默认收起错误信息 -Findyou -->
+     <!--增加错误的颜色 - sycing -->
+    <button id='btn_%(tid)s' type="button"  class="btn %(fail)s btn-xs collapsed" data-toggle="collapse" data-target='#div_%(tid)s'>%(status)s</button>
+    <div id='div_%(tid)s' class="collapse" style="
+    position: relative;
+    left: 0px;
+    top: 0px;
+    /* border: solid #627173 1px; */ 
+    padding: 10px;
+    background-color: #E6E6D6;
+    font-family: "Lucida Console", "Courier New", Courier, monospace;
+    text-align: left;
+    font-size: 8pt;
+    width: 500px;">  
 
-    <!-- 默认展开错误信息 -Findyou -->
-    <button id='btn_%(tid)s' type="button"  class="btn btn-danger btn-xs" data-toggle="collapse" data-target='#div_%(tid)s'>%(status)s</button>
+    <!-- 默认展开错误信息 -Findyou 
+    <button id='btn_%(tid)s' type="button"  class="btn %(fail)s btn-xs" data-toggle="collapse" data-target='#div_%(tid)s'>%(status)s</button>
     <div id='div_%(tid)s' class="collapse in">
-    <pre>
+    -->
+    <pre align='left'>
     %(script)s
     </pre>
     </div>
@@ -702,7 +724,9 @@ class HTMLTestRunner(Template_mixin):
         # e.g. 'pt1.1', 'ft1.1', etc
         has_output = bool(o or e)
         # ID修改点为下划线,支持Bootstrap折叠展开特效 - Findyou
-        tid = (n == 0 and 'p' or 'f') + 't%s_%s' % (cid+1,tid+1)
+        # tid = (n == 0 and 'p' or 'f') + 't%s_%s' % (cid+1,tid+1)
+        #增加错误用例的显示 ---sycing
+        tid = (n == 0 and 'p' or  (n ==1 and 'f' or 'e')) + 't%s_%s' % (cid + 1, tid + 1)
         name = t.id().split('.')[-1]
         doc = t.shortDescription() or ""
         desc = doc and ('%s: %s' % (name, doc)) or name
@@ -737,6 +761,7 @@ class HTMLTestRunner(Template_mixin):
             desc = desc,
             script = script,
             status = self.STATUS[n],
+            fail=n == 1 and 'btn-danger' or 'btn-warning' #区分错误，失败的按钮颜色 --sycing
         )
         rows.append(row)
         if not has_output:
