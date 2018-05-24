@@ -73,9 +73,10 @@ python test_HTMLTestRunnerEN.py
 --------------------------
 使用同HTMLTestRunnerEN，无区别<br>
 * 执行结果：Report.html
-![](https://github.com/sycing/python/blob/master/Report_CN.gif "测试结果") 
-*python3.x 中文执行结果：Report.html
-![](https://github.com/findyou/python/blob/master/Report_CN_py3.gif "测试结果") 
+![](https://github.com/sycing/HTMLTestRunnerCN/blob/master/Report_CN.gif "测试结果") 
+
+* python3.x 中文执行结果：Report.html
+![](https://github.com/sycing/HTMLTestRunnerCN/blob/master/Report_CN_py3.gif"测试结果") 
 
 三、HTMLTestReportCN（python3.x） 使用
 --------------------------
