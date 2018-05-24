@@ -75,13 +75,45 @@ python test_HTMLTestRunnerEN.py
 * 执行结果：Report.html
 ![](https://github.com/sycing/HTMLTestRunnerCN/blob/master/Report_CN.gif "测试结果") 
 
+
+
+三、`HTMLTestReportCN（python3.x） 使用`
+--------------------------
+使用HTMLTestRunnerCN，测试用例中必须增加 `self.case_id、self.case_descript`<br>
+* 编写test_HTMLTestRunnerCN.py<br>
+```python
+import HTMLTestRunnerEN
+...
+class MyTestCase(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def testCase1(self):
+        self.case_id = 'test_pass_001'#必须增加
+        self.case_descript = '测试成功的样式'#必须增加
+        self.assertEqual(2,2,"testSucess")
+
+if __name__ == '__main__':
+    filePath ='F:\\Report.html'
+    fp = file(filePath,'wb')
+    runner = HTMLTestRunnerEN.HTMLTestRunner(
+        stream=fp,
+        title='{ Test Report }',
+        #description='',
+        #tester="Findyou"
+        )
+    runner.run(Suite())
+```
+
+* 执行test_HTMLTestRunnerEN.py<br>
+```python
+python test_HTMLTestRunnerEN.py
+```
 * python3.x 中文执行结果：Report.html
 ![](https://github.com/sycing/HTMLTestRunnerCN/blob/master/Report_CN_py3.gif "测试结果") 
-
-三、HTMLTestReportCN（python3.x） 使用
---------------------------
-使用同HTMLTestRunnerEN，无区别<br>
-<br>
 
 四、HTMLTestReportEN（python3.x） 使用
 --------------------------
