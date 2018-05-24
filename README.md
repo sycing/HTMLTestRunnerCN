@@ -4,6 +4,17 @@ HTMLTestRunner输出的报告真的很丑,于是找了一圈没有我自已想�
 原作者文件下载地址：http://tungwaiyip.info/software/HTMLTestRunner.html<br>
 我基于其Version 0.8.2进行了修改美化具体内容如下：<br>
 ```python
+
+Version 0.8.2.3 -Sycing
+*仅修改py3中文部分
+   # Version 0.8.2.3
+   #增加错误结果的按钮
+   #增加用例编号，用例描述两列
+   #错误用例显示为橘黄色
+   #总计列移动到错误后面
+   #概要按钮去掉通过率显示
+   #测试脚本的测试用例必须增加：self.case_id,self_descript
+
 Version 20170609   -Findyou
 * python3x  #仅支持python3x
    # Version 0.8.2.2
@@ -57,12 +68,14 @@ python test_HTMLTestRunnerEN.py
 * 执行结果：Report.html
 ![](https://github.com/findyou/python/blob/master/Report_EN.gif "测试结果") 
 
+
 二、HTMLTestRunnerCN（python2.x） 使用
 --------------------------
 使用同HTMLTestRunnerEN，无区别<br>
 * 执行结果：Report.html
-![](https://github.com/findyou/python/blob/master/Report_CN.gif "测试结果") 
-
+![](https://github.com/sycing/python/blob/master/Report_CN.gif "测试结果") 
+*python3.x 中文执行结果：Report.html
+![](https://github.com/findyou/python/blob/master/Report_CN_py3.gif "测试结果") 
 
 三、HTMLTestReportCN（python3.x） 使用
 --------------------------

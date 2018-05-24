@@ -65,20 +65,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # URL: http://tungwaiyip.info/software/HTMLTestRunner.html
 
-__author__ = "Sycing"
-__version__ = "0.8.2.3"
+__author__ = "Wai Yip Tung,  Findyou"
+__version__ = "0.8.2.1"
 
 
 """
 Change History
-Version 0.8.2.3 -Sycing
-*增加错误结果的按钮
-*增加用例编号，用例描述两列
-*错误用例显示为橘黄色
-*总计列移动到错误后面
-*概要按钮去掉通过率显示
-Version 0.8.2.1 -Findyou
-* 改为支持python3
 
 Version 0.8.2.1 -Findyou
 * 支持中文，汉化
@@ -107,12 +99,14 @@ Version in 0.7.1
 # TODO: simplify javascript using ,ore than 1 class in the class attribute?
 
 import datetime
-import io
+import StringIO
 import sys
 import time
 import unittest
 from xml.sax import saxutils
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 # ------------------------------------------------------------------------
 # The redirectors below are used to capture output during testing. Output
@@ -226,7 +220,7 @@ function showCase(level) {
         tr = trs[i];
         id = tr.id;
         if (id.substr(0,2) == 'ft') {
-            if (level == 2 || level == 0 || level == 4 ) {
+            if (level == 2 || level == 0 ) {
                 tr.className = 'hiddenRow';
             }
             else {
@@ -234,20 +228,11 @@ function showCase(level) {
             }
         }
         if (id.substr(0,2) == 'pt') {
-            if (level < 2 || level == 4) {
+            if (level < 2) {
                 tr.className = 'hiddenRow';
             }
             else {
                 tr.className = '';
-            }
-        }
-        //增加错误的按钮 --sycing
-        if (id.substr(0,2) == 'et') {
-            if (level==4 || level == 3) {
-                tr.className = '';
-            }
-            else {
-                tr.className = 'hiddenRow';
             }
         }
     }
@@ -278,11 +263,6 @@ function showClassDetail(cid, count) {
         if (!tr) {
             tid = 'p' + tid0;
             tr = document.getElementById(tid);
-            //修改无法打开关闭收起，展开的bug --sycing
-            if(!tr){
-             tid = 'e' + tid0;
-            tr = document.getElementById(tid);
-            }
         }
         id_list[i] = tid;
         if (tr.className) {
@@ -375,13 +355,10 @@ table       { font-size: 100%; }
     # 汉化,加美化效果 --Findyou
     REPORT_TMPL = """
 <p id='show_detail_line'>
-<!-- <a class="btn btn-primary" href='javascript:showCase(0)'>概要 { %(passrate)s }</a> -->
-<a class="btn btn-primary" href='javascript:showCase(0)'>概要 </a>
-<a class="btn btn-info" href='javascript:showCase(3)'>所有 { %(count)s }</a>
-<a class="btn btn-success" href='javascript:showCase(2)'>通过{ %(Pass)s }</a>
+<a class="btn btn-primary" href='javascript:showCase(0)'>概要{ %(passrate)s }</a>
 <a class="btn btn-danger" href='javascript:showCase(1)'>失败{ %(fail)s }</a>
-<a class="btn btn-warning" href='javascript:showCase(4)'>错误{ %(error)s }</a>
-
+<a class="btn btn-success" href='javascript:showCase(2)'>通过{ %(Pass)s }</a>
+<a class="btn btn-info" href='javascript:showCase(3)'>所有{ %(count)s }</a>
 </p>
 <table id='result_table' class="table table-condensed table-bordered table-hover">
 <colgroup>
@@ -394,23 +371,19 @@ table       { font-size: 100%; }
 </colgroup>
 <tr id='header_row' class="text-center success" style="font-weight: bold;font-size: 14px;">
     <td>用例集/测试用例</td>
-    <td>用例编号</td>
-    <td>用例描述</td>
+    <td>总计</td>
     <td>通过</td>
     <td>失败</td>
     <td>错误</td>
-    <td>总计</td>
     <td>详细</td>
 </tr>
 %(test_list)s
 <tr id='total_row' class="text-center active">
     <td>总计</td>
-    <td></td>
-    <td></td>
+    <td>%(count)s</td>
     <td>%(Pass)s</td>
     <td>%(fail)s</td>
     <td>%(error)s</td>
-    <td>%(count)s</td>
     <td>通过率：%(passrate)s</td>
 </tr>
 </table>
@@ -419,12 +392,10 @@ table       { font-size: 100%; }
     REPORT_CLASS_TMPL = r"""
 <tr class='%(style)s warning'>
     <td>%(desc)s</td>
-    <td class="text-center"></td>
-    <td class="text-center"></td>
+    <td class="text-center">%(count)s</td>
     <td class="text-center">%(Pass)s</td>
     <td class="text-center">%(fail)s</td>
     <td class="text-center">%(error)s</td>
-    <td class="text-center">%(count)s</td>
     <td class="text-center"><a href="javascript:showClassDetail('%(cid)s',%(count)s)" class="detail" id='%(cid)s'>详细</a></td>
 </tr>
 """ # variables: (style, desc, count, Pass, fail, error, cid)
@@ -433,29 +404,15 @@ table       { font-size: 100%; }
     REPORT_TEST_WITH_OUTPUT_TMPL = r"""
 <tr id='%(tid)s' class='%(Class)s'>
     <td class='%(style)s'><div class='testcase'>%(desc)s</div></td>
-     <td>%(id)s</td>
-    <td>%(descript)s</td>
     <td colspan='5' align='center'>
-    <!--默认收起错误信息 -Findyou -->
-     <!--增加错误的颜色 - sycing -->
-    <button id='btn_%(tid)s' type="button"  class="btn %(fail)s btn-xs collapsed" data-toggle="collapse" data-target='#div_%(tid)s'>%(status)s</button>
-    <div id='div_%(tid)s' class="collapse" style="
-    position: relative;
-    left: 0px;
-    top: 0px;
-    /* border: solid #627173 1px; */ 
-    padding: 10px;
-    background-color: #E6E6D6;
-    font-family: "Lucida Console", "Courier New", Courier, monospace;
-    text-align: left;
-    font-size: 8pt;
-    width: 500px;">  
+    <!--默认收起错误信息 -Findyou
+    <button id='btn_%(tid)s' type="button"  class="btn btn-danger btn-xs collapsed" data-toggle="collapse" data-target='#div_%(tid)s'>%(status)s</button>
+    <div id='div_%(tid)s' class="collapse">  -->
 
-    <!-- 默认展开错误信息 -Findyou 
-    <button id='btn_%(tid)s' type="button"  class="btn %(fail)s btn-xs" data-toggle="collapse" data-target='#div_%(tid)s'>%(status)s</button>
+    <!-- 默认展开错误信息 -Findyou -->
+    <button id='btn_%(tid)s' type="button"  class="btn btn-danger btn-xs" data-toggle="collapse" data-target='#div_%(tid)s'>%(status)s</button>
     <div id='div_%(tid)s' class="collapse in">
-    -->
-    <pre align='left'>
+    <pre>
     %(script)s
     </pre>
     </div>
@@ -465,10 +422,8 @@ table       { font-size: 100%; }
 
     # 通过 的样式，加标签效果  -Findyou
     REPORT_TEST_NO_OUTPUT_TMPL = r"""
-    <tr id='%(tid)s' class='%(Class)s'>
+<tr id='%(tid)s' class='%(Class)s'>
     <td class='%(style)s'><div class='testcase'>%(desc)s</div></td>
-    <td>%(id)s</td>
-    <td>%(descript)s</td>
     <td colspan='5' align='center'><span class="label label-success success">%(status)s</span></td>
 </tr>
 """ # variables: (tid, Class, style, desc, status)
@@ -520,7 +475,7 @@ class _TestResult(TestResult):
     def startTest(self, test):
         TestResult.startTest(self, test)
         # just one buffer for both stdout and stderr
-        self.outputBuffer = io.StringIO()
+        self.outputBuffer = StringIO.StringIO()
         stdout_redirector.fp = self.outputBuffer
         stderr_redirector.fp = self.outputBuffer
         self.stdout0 = sys.stdout
@@ -616,7 +571,7 @@ class HTMLTestRunner(Template_mixin):
         test(result)
         self.stopTime = datetime.datetime.now()
         self.generateReport(test, result)
-        print('\nTime Elapsed: %s' % (self.stopTime-self.startTime), file=sys.stderr)
+        print >>sys.stderr, '\nTime Elapsed: %s' % (self.stopTime-self.startTime)
         return result
 
 
@@ -627,7 +582,7 @@ class HTMLTestRunner(Template_mixin):
         classes = []
         for n,t,o,e in result_list:
             cls = t.__class__
-            if cls not in rmap:
+            if not rmap.has_key(cls):
                 rmap[cls] = []
                 classes.append(cls)
             rmap[cls].append((n,t,o,e))
@@ -649,17 +604,14 @@ class HTMLTestRunner(Template_mixin):
         if result.error_count:   status.append('错误 %s'   % result.error_count  )
         if status:
             status = '，'.join(status)
-            all_count=result.success_count + result.failure_count + result.error_count
-            if all_count==0:
-                all_count=1
-            self.passrate = str("%.2f%%" % (float(result.success_count) / float(all_count) * 100))
+            self.passrate = str("%.2f%%" % (float(result.success_count) / float(result.success_count + result.failure_count + result.error_count) * 100))
         else:
             status = 'none'
         return [
-            ('测试人员', self.tester),
-            ('开始时间',startTime),
-            ('合计耗时',duration),
-            ('测试结果',status + "，通过率 "+self.passrate),
+            (u'测试人员', self.tester),
+            (u'开始时间',startTime),
+            (u'合计耗时',duration),
+            (u'测试结果',status + "，通过率= "+self.passrate),
         ]
 
 
@@ -720,9 +672,7 @@ class HTMLTestRunner(Template_mixin):
                 name = "%s.%s" % (cls.__module__, cls.__name__)
             doc = cls.__doc__ and cls.__doc__.split("\n")[0] or ""
             desc = doc and '%s: %s' % (name, doc) or name
-            # print(cls_results)
-            # self.case_id=cls_results[0][1].case_id
-            # self.case_descript=cls_results[0][1].case_descript
+
             row = self.REPORT_CLASS_TMPL % dict(
                 style = ne > 0 and 'errorClass' or nf > 0 and 'failClass' or 'passClass',
                 desc = desc,
@@ -735,8 +685,6 @@ class HTMLTestRunner(Template_mixin):
             rows.append(row)
 
             for tid, (n,t,o,e) in enumerate(cls_results):
-                self.case_id=t.case_id
-                self.case_descript=t.case_descript
                 self._generate_report_test(rows, cid, tid, n, t, o, e)
 
         report = self.REPORT_TMPL % dict(
@@ -754,9 +702,7 @@ class HTMLTestRunner(Template_mixin):
         # e.g. 'pt1.1', 'ft1.1', etc
         has_output = bool(o or e)
         # ID修改点为下划线,支持Bootstrap折叠展开特效 - Findyou
-        # tid = (n == 0 and 'p' or 'f') + 't%s_%s' % (cid+1,tid+1)
-        #增加错误用例的显示 ---sycing
-        tid = (n == 0 and 'p' or  (n ==1 and 'f' or 'e')) + 't%s_%s' % (cid + 1, tid + 1)
+        tid = (n == 0 and 'p' or 'f') + 't%s_%s' % (cid+1,tid+1)
         name = t.id().split('.')[-1]
         doc = t.shortDescription() or ""
         desc = doc and ('%s: %s' % (name, doc)) or name
@@ -768,14 +714,14 @@ class HTMLTestRunner(Template_mixin):
             # TODO: some problem with 'string_escape': it escape \n and mess up formating
             # uo = unicode(o.encode('string_escape'))
             # uo = o.decode('latin-1')
-            uo = o
+            uo = o.decode('utf-8')
         else:
             uo = o
         if isinstance(e, str):
             # TODO: some problem with 'string_escape': it escape \n and mess up formating
             # ue = unicode(e.encode('string_escape'))
             # ue = e.decode('latin-1')
-            ue = e
+            ue = e.decode('utf-8')
         else:
             ue = e
 
@@ -791,9 +737,6 @@ class HTMLTestRunner(Template_mixin):
             desc = desc,
             script = script,
             status = self.STATUS[n],
-            fail=n == 1 and 'btn-danger' or 'btn-warning', #区分错误，失败的按钮颜色 --sycing
-            id=self.case_id,
-            descript=self.case_descript
         )
         rows.append(row)
         if not has_output:

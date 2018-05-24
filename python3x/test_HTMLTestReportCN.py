@@ -9,24 +9,33 @@ import HTMLTestReportCN
 
 class MyTestCase(unittest.TestCase):
     def setUp(self):
-        pass
+        self.case_id = ''
+        self.case_descript = ''
 
     def tearDown(self):
         pass
 
 
     def testCase1(self):
-        self.assertEqual(2,2,"testError")
+        self.case_id = 'test_pass_001'
+        self.case_descript = '测试成功的样式'
+        self.assertEqual(2,2,"testSucess")
 
 
     def testCase2(self):
-        self.assertEqual(2,3,"testError")
+        self.case_id = 'test_fail_002'
+        self.case_descript = '测试失败的样式'
+        self.assertEqual(2,3,"testFail")
 
     def testCase3(self):
-        self.assertEqual(2,5,"测试错误")
+        self.case_id = 'test_fail_003'
+        self.case_descript = '测试失败的样式'
+        self.assertEqual(2,5,"测试失败")
 
     def testCase4(self):
-        self.assertEqual(2,1,"测试错误")
+        self.case_id = 'test_fail_004'
+        self.case_descript = '测试失败的样式'
+        self.assertEqual(2,1,"测试失败")
 
     def testCase5(self):
         pass
@@ -39,23 +48,37 @@ class APITestCase(unittest.TestCase):
         pass
 
     def testCase1(self):
-        self.assertEqual(2, 2, "testError")
+        self.case_id = 'test_pass_001'
+        self.case_descript = '测试成功的样式'
+        self.assertEqual(2, 2, "testPass")
 
     def testCase2(self):
-        self.assertEqual(3, 3, "testError")
+        self.case_id = 'test_pass_002'
+        self.case_descript = '测试成功的样式'
+        self.assertEqual(3, 3, "testPass")
 
     def testCase3(self):
-        self.assertEqual(5, 5, "testError")
+        self.case_id = 'test_pass_003'
+        self.case_descript = '测试成功的样式'
+        self.assertEqual(5, 5, "testPass")
 
     def testCase4(self):
+        self.case_id = 'test_fail_004'
+        self.case_descript = '测试失败的样式'
         self.assertEqual(2, 1, "测试错误")
 
     def testCase5(self):
-        self.assertEqual(2, 9, "testError")
+        self.case_id = 'test_fail_005'
+        self.case_descript = '测试失败的样式'
+        self.assertEqual(2, 9, "testFail")
 
     def testCase6(self):
+        self.case_id = 'test_pass_006'
+        self.case_descript = '测试成功的样式'
         pass
     def testCase7(self):
+        self.case_id = 'test_error_007'
+        self.case_descript = '测试错误的样式'
         a==b
 
 #添加Suite
@@ -98,7 +121,7 @@ if __name__ == '__main__':
         stream=fp,
         title='自动化测试报告',
         #description='详细测试用例结果',
-        tester='Findyou'
+        tester='Sycing'
         )
     #运行测试用例
     runner.run(Suite())
